@@ -12,7 +12,6 @@ import (
 
 type Runner struct {
 	watcher    *rnotify.Watcher
-	cmd        *exec.Cmd
 	eventCh    chan string
 	extensions map[string]bool
 }
@@ -33,7 +32,13 @@ func (r *Runner) Run() error {
 			r.discardEvents()
 			if _, ok := r.extensions[filepath.Ext(filename)]; ok {
 				fmt.Printf("Run command\n")
-				r.cmd.Run()
+				stdoutStderr, err := exec.Command("go", "build", ".").CombinedOutput()
+				if err != nil {
+					fmt.Printf("command failed: %v\n", err)
+				}
+				if len(string(stdoutStderr)) != 0 {
+					fmt.Printf("%s\n", stdoutStderr)
+				}
 			}
 		}
 	}
@@ -90,7 +95,6 @@ func main() {
 	r := Runner{
 		eventCh:    make(chan string, 1000),
 		watcher:    watcher,
-		cmd:        exec.Command("go", "build", "."),
 		extensions: map[string]bool{".go": true},
 	}
 
