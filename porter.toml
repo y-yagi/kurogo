@@ -1,0 +1,4 @@
+[[actions]]
+extensions = [".go"]
+command = "ls -a"
+

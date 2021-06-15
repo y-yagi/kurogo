@@ -7,13 +7,24 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/y-yagi/rnotify"
 )
 
 type Runner struct {
-	watcher    *rnotify.Watcher
-	eventCh    chan string
-	extensions map[string]bool
+	watcher *rnotify.Watcher
+	eventCh chan string
+	cfg     Config
+}
+
+type Config struct {
+	Actions []Action
+}
+
+type Action struct {
+	Command       string
+	Extensions    []string
+	extensionsMap map[string]bool
 }
 
 func (r *Runner) Run() error {
@@ -30,14 +41,18 @@ func (r *Runner) Run() error {
 		case filename = <-r.eventCh:
 			time.Sleep(500 * time.Millisecond)
 			r.discardEvents()
-			if _, ok := r.extensions[filepath.Ext(filename)]; ok {
-				fmt.Printf("Run command\n")
-				stdoutStderr, err := exec.Command("go", "build", ".").CombinedOutput()
-				if err != nil {
-					fmt.Printf("command failed: %v\n", err)
-				}
-				if len(string(stdoutStderr)) != 0 {
-					fmt.Printf("%s\n", stdoutStderr)
+
+			for _, action := range r.cfg.Actions {
+				if _, ok := action.extensionsMap[filepath.Ext(filename)]; ok {
+					fmt.Printf("Run command\n")
+					stdoutStderr, err := exec.Command("go", "build", ".").CombinedOutput()
+					if err != nil {
+						fmt.Printf("command failed: %v\n", err)
+					}
+
+					if len(string(stdoutStderr)) != 0 {
+						fmt.Printf("%s\n", stdoutStderr)
+					}
 				}
 			}
 		}
@@ -87,18 +102,42 @@ func (r *Runner) discardEvents() {
 func main() {
 	// cmd.Env = append(os.Environ(), command.envs...)
 
+	cfg, err := parseConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	watcher, err := rnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	r := Runner{
-		eventCh:    make(chan string, 1000),
-		watcher:    watcher,
-		extensions: map[string]bool{".go": true},
+		eventCh: make(chan string, 1000),
+		watcher: watcher,
+		cfg:     *cfg,
 	}
 
 	defer r.watcher.Close()
 
-	r.Run()
+	if err = r.Run(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func parseConfig() (*Config, error) {
+	var cfg Config
+	if _, err := toml.DecodeFile("porter.toml", &cfg); err != nil {
+		return nil, err
+	}
+
+	for k, action := range cfg.Actions {
+		m := map[string]bool{}
+		for _, extension := range action.Extensions {
+			m[extension] = true
+		}
+		cfg.Actions[k].extensionsMap = m
+	}
+
+	return &cfg, nil
 }
