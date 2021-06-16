@@ -5,6 +5,7 @@ import (
 	"log"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/BurntSushi/toml"
@@ -45,7 +46,8 @@ func (r *Runner) Run() error {
 			for _, action := range r.cfg.Actions {
 				if _, ok := action.extensionsMap[filepath.Ext(filename)]; ok {
 					fmt.Printf("Run command\n")
-					stdoutStderr, err := exec.Command("go", "build", ".").CombinedOutput()
+					cmd := strings.Split(action.Command, " ")
+					stdoutStderr, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
 					if err != nil {
 						fmt.Printf("command failed: %v\n", err)
 					}
