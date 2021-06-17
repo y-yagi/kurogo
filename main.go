@@ -85,7 +85,11 @@ func (r *Runner) watch() error {
 					return
 				}
 
-				r.eventCh <- event.Name
+				for _, action := range r.cfg.Actions {
+					if _, ok := action.extensionsMap[filepath.Ext(event.Name)]; ok {
+						r.eventCh <- event.Name
+					}
+				}
 			case err, ok := <-r.watcher.Errors:
 				if !ok {
 					return
