@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"io"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/fatih/color"
+	"github.com/y-yagi/porter/internal/log"
 	"github.com/y-yagi/rnotify"
 )
 
@@ -17,6 +18,7 @@ type Runner struct {
 	watcher *rnotify.Watcher
 	eventCh chan string
 	cfg     Config
+	logger  *log.PorterLogger
 }
 
 type Config struct {
@@ -31,8 +33,6 @@ type Action struct {
 
 func (r *Runner) Run() error {
 	done := make(chan bool)
-	red := color.New(color.FgRed)
-	green := color.New(color.FgGreen)
 
 	if err := r.watch(); err != nil {
 		return err
@@ -52,15 +52,15 @@ func (r *Runner) Run() error {
 					cmd := strings.Split(action.Command, " ")
 					stdoutStderr, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
 					if err != nil {
-						red.Printf("'%v' failed! %v\n", action.Command, err)
+						logger.Printf(log.Red, "'%v' failed! %v\n", action.Command, err)
 					}
 
 					if len(string(stdoutStderr)) != 0 {
-						fmt.Printf("%s\n", stdoutStderr)
+						logger.Printf(nil, "%s\n", stdoutStderr)
 					}
 
 					if err == nil {
-						green.Printf("'%v' success!\n", action.Command)
+						logger.Printf(log.Green, "'%v' success!\n", action.Command)
 					}
 				}
 			}
@@ -94,7 +94,7 @@ func (r *Runner) watch() error {
 				if !ok {
 					return
 				}
-				log.Println("error:", err)
+				logger.Printf(log.Red, "error: %v\n", err)
 			}
 		}
 	}()
@@ -112,17 +112,36 @@ func (r *Runner) discardEvents() {
 	}
 }
 
+func msg(err error, stderr io.Writer) int {
+	if err != nil {
+		fmt.Fprintf(stderr, "%s: %+v\n", cmd, err)
+		return 1
+	}
+	return 0
+}
+
+const cmd = "porter"
+
+var (
+	logger *log.PorterLogger
+)
+
 func main() {
+	logger = log.NewPorterLogger(os.Stdout, false)
+	os.Exit(run(os.Args, os.Stdout, os.Stderr))
+}
+
+func run(args []string, stdout, stderr io.Writer) (exitCode int) {
 	// cmd.Env = append(os.Environ(), command.envs...)
 
 	cfg, err := parseConfig()
 	if err != nil {
-		log.Fatal(err)
+		return msg(err, stderr)
 	}
 
 	watcher, err := rnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		return msg(err, stderr)
 	}
 
 	r := Runner{
@@ -134,8 +153,10 @@ func main() {
 	defer r.watcher.Close()
 
 	if err = r.Run(); err != nil {
-		log.Fatal(err)
+		return msg(err, stderr)
 	}
+
+	return 0
 }
 
 func parseConfig() (*Config, error) {
