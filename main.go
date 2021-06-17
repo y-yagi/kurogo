@@ -52,7 +52,7 @@ func (r *Runner) Run() error {
 					cmd := strings.Split(action.Command, " ")
 					stdoutStderr, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
 					if err != nil {
-						red.Printf("command failed! %v\n", err)
+						red.Printf("'%v' failed! %v\n", action.Command, err)
 					}
 
 					if len(string(stdoutStderr)) != 0 {
@@ -60,7 +60,7 @@ func (r *Runner) Run() error {
 					}
 
 					if err == nil {
-						green.Println("command success!")
+						green.Printf("'%v' success!\n", action.Command)
 					}
 				}
 			}
