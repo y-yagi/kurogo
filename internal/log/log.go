@@ -41,3 +41,8 @@ func (l *KurogoLogger) DebugPrintf(color *color.Color, format string, a ...inter
 		l.Printf(color, format, a)
 	}
 }
+
+// EnableDebugLog enable debug log.
+func (l *KurogoLogger) EnableDebugLog() {
+	l.debug = true
+}

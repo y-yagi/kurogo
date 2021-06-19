@@ -18,6 +18,7 @@ var (
 	flags       *flag.FlagSet
 	showVersion bool
 	configFile  string
+	debug       bool
 
 	logger  *log.KurogoLogger
 	version = "devel"
@@ -32,13 +33,14 @@ func usage() {
 func setFlags() {
 	flags = flag.NewFlagSet(cmd, flag.ExitOnError)
 	flags.BoolVar(&showVersion, "v", false, "print version number")
+	flags.BoolVar(&debug, "d", false, "enable debug log")
 	flags.StringVar(&configFile, "f", "kurogo.toml", "use file as a configuration file")
 	flags.Usage = usage
 }
 
 func main() {
-	setFlags()
 	logger = log.NewKurogoLogger(os.Stdout, false)
+	setFlags()
 	os.Exit(run(os.Args, os.Stdout, os.Stderr))
 }
 
@@ -59,6 +61,10 @@ func run(args []string, stdout, stderr io.Writer) int {
 	if showVersion {
 		fmt.Fprintf(stdout, "%s %s (runtime: %s)\n", cmd, version, runtime.Version())
 		return 0
+	}
+
+	if debug {
+		logger.EnableDebugLog()
 	}
 
 	r, err := runner.NewRunner(configFile, logger)

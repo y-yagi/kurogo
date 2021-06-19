@@ -96,7 +96,7 @@ func (r *Runner) watch() error {
 		for {
 			select {
 			case event, ok := <-r.watcher.Events:
-				// fmt.Printf("%v\n", event)
+				r.logger.DebugPrintf(nil, "file event: %+v\n", event)
 				if !ok {
 					return
 				}
