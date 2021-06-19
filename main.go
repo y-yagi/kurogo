@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/y-yagi/porter/internal/log"
+	"github.com/y-yagi/kurogo/internal/log"
 	"github.com/y-yagi/rnotify"
 )
 
@@ -18,7 +18,7 @@ type Runner struct {
 	watcher *rnotify.Watcher
 	eventCh chan string
 	cfg     Config
-	logger  *log.PorterLogger
+	logger  *log.KurogoLogger
 }
 
 type Config struct {
@@ -120,14 +120,14 @@ func msg(err error, stderr io.Writer) int {
 	return 0
 }
 
-const cmd = "porter"
+const cmd = "kurogo"
 
 var (
-	logger *log.PorterLogger
+	logger *log.KurogoLogger
 )
 
 func main() {
-	logger = log.NewPorterLogger(os.Stdout, false)
+	logger = log.NewKurogoLogger(os.Stdout, false)
 	os.Exit(run(os.Args, os.Stdout, os.Stderr))
 }
 
@@ -161,7 +161,7 @@ func run(args []string, stdout, stderr io.Writer) (exitCode int) {
 
 func parseConfig() (*Config, error) {
 	var cfg Config
-	if _, err := toml.DecodeFile("porter.toml", &cfg); err != nil {
+	if _, err := toml.DecodeFile("kurogo.toml", &cfg); err != nil {
 		return nil, err
 	}
 

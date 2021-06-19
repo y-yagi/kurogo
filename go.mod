@@ -1,4 +1,4 @@
-module github.com/y-yagi/porter
+module github.com/y-yagi/kurogo
 
 go 1.16
 
