@@ -44,8 +44,6 @@ func NewRunner(filename string, logger *log.KurogoLogger) (*Runner, error) {
 }
 
 func (r *Runner) Run() error {
-	done := make(chan bool)
-
 	if err := r.watch(); err != nil {
 		return err
 	}
@@ -78,9 +76,6 @@ func (r *Runner) Run() error {
 			}
 		}
 	}
-
-	<-done
-	return nil
 }
 
 func (r *Runner) Terminate() error {
