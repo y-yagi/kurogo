@@ -17,6 +17,7 @@ type Runner struct {
 	cfg                 Config
 	logger              *log.KurogoLogger
 	actionWithExtension map[string]*Action
+	actionWithFile      map[string]*Action
 }
 
 type Config struct {
@@ -26,6 +27,7 @@ type Config struct {
 type Action struct {
 	Command    string
 	Extensions []string
+	Files      []string
 }
 
 func NewRunner(filename string, logger *log.KurogoLogger) (*Runner, error) {
@@ -33,6 +35,7 @@ func NewRunner(filename string, logger *log.KurogoLogger) (*Runner, error) {
 		eventCh:             make(chan string, 1000),
 		logger:              logger,
 		actionWithExtension: map[string]*Action{},
+		actionWithFile:      map[string]*Action{},
 	}
 
 	if err := r.buildWatcher(); err != nil {
@@ -57,20 +60,11 @@ func (r *Runner) Run() error {
 		r.discardEvents()
 
 		if action, ok := r.actionWithExtension[filepath.Ext(filename)]; ok {
-			r.logger.Printf(nil, "Run '%v'\n", action.Command)
-			cmd := strings.Split(action.Command, " ")
-			stdoutStderr, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
-			if err != nil {
-				r.logger.Printf(log.Red, "'%v' failed! %v\n", action.Command, err)
-			}
+			r.executeCmd(action)
+		}
 
-			if len(string(stdoutStderr)) != 0 {
-				r.logger.Printf(nil, "%s\n", stdoutStderr)
-			}
-
-			if err == nil {
-				r.logger.Printf(log.Green, "'%v' success!\n", action.Command)
-			}
+		if action, ok := r.actionWithFile[filepath.Base(filename)]; ok {
+			r.executeCmd(action)
 		}
 	}
 }
@@ -94,6 +88,8 @@ func (r *Runner) watch() error {
 				}
 
 				if _, ok := r.actionWithExtension[filepath.Ext(event.Name)]; ok {
+					r.eventCh <- event.Name
+				} else if _, ok := r.actionWithFile[filepath.Base(event.Name)]; ok {
 					r.eventCh <- event.Name
 				}
 			case err, ok := <-r.watcher.Errors:
@@ -127,6 +123,10 @@ func (r *Runner) parseConfig(filename string) error {
 		for _, extension := range action.Extensions {
 			r.actionWithExtension[extension] = &r.cfg.Actions[m]
 		}
+
+		for _, file := range action.Files {
+			r.actionWithFile[file] = &r.cfg.Actions[m]
+		}
 	}
 
 	return nil
@@ -139,4 +139,21 @@ func (r *Runner) buildWatcher() error {
 	}
 
 	return nil
+}
+
+func (r *Runner) executeCmd(action *Action) {
+	r.logger.Printf(nil, "Run '%v'\n", action.Command)
+	cmd := strings.Split(action.Command, " ")
+	stdoutStderr, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
+	if err != nil {
+		r.logger.Printf(log.Red, "'%v' failed! %v\n", action.Command, err)
+	}
+
+	if len(string(stdoutStderr)) != 0 {
+		r.logger.Printf(nil, "%s\n", stdoutStderr)
+	}
+
+	if err == nil {
+		r.logger.Printf(log.Green, "'%v' success!\n", action.Command)
+	}
 }
