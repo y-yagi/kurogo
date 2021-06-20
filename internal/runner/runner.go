@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"fmt"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -55,7 +54,7 @@ func (r *Runner) Run() error {
 
 		for _, action := range r.cfg.Actions {
 			if _, ok := action.extensionsMap[filepath.Ext(filename)]; ok {
-				fmt.Printf("Run '%v'\n", action.Command)
+				r.logger.Printf(nil, "Run '%v'\n", action.Command)
 				cmd := strings.Split(action.Command, " ")
 				stdoutStderr, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
 				if err != nil {
