@@ -44,43 +44,34 @@ func NewRunner(filename string, logger *log.KurogoLogger) (*Runner, error) {
 }
 
 func (r *Runner) Run() error {
-	done := make(chan bool)
-
 	if err := r.watch(); err != nil {
 		return err
 	}
 
 	for {
-		var filename string
+		filename := <-r.eventCh
+		time.Sleep(500 * time.Millisecond)
+		r.discardEvents()
 
-		select {
-		case filename = <-r.eventCh:
-			time.Sleep(500 * time.Millisecond)
-			r.discardEvents()
+		for _, action := range r.cfg.Actions {
+			if _, ok := action.extensionsMap[filepath.Ext(filename)]; ok {
+				fmt.Printf("Run '%v'\n", action.Command)
+				cmd := strings.Split(action.Command, " ")
+				stdoutStderr, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
+				if err != nil {
+					r.logger.Printf(log.Red, "'%v' failed! %v\n", action.Command, err)
+				}
 
-			for _, action := range r.cfg.Actions {
-				if _, ok := action.extensionsMap[filepath.Ext(filename)]; ok {
-					fmt.Printf("Run '%v'\n", action.Command)
-					cmd := strings.Split(action.Command, " ")
-					stdoutStderr, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
-					if err != nil {
-						r.logger.Printf(log.Red, "'%v' failed! %v\n", action.Command, err)
-					}
+				if len(string(stdoutStderr)) != 0 {
+					r.logger.Printf(nil, "%s\n", stdoutStderr)
+				}
 
-					if len(string(stdoutStderr)) != 0 {
-						r.logger.Printf(nil, "%s\n", stdoutStderr)
-					}
-
-					if err == nil {
-						r.logger.Printf(log.Green, "'%v' success!\n", action.Command)
-					}
+				if err == nil {
+					r.logger.Printf(log.Green, "'%v' success!\n", action.Command)
 				}
 			}
 		}
 	}
-
-	<-done
-	return nil
 }
 
 func (r *Runner) Terminate() error {

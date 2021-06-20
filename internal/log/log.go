@@ -38,7 +38,7 @@ func (l *KurogoLogger) Printf(c *color.Color, format string, a ...interface{}) {
 // DebugPrintf print log with format when debug is enabled.
 func (l *KurogoLogger) DebugPrintf(color *color.Color, format string, a ...interface{}) {
 	if l.debug {
-		l.Printf(color, format, a)
+		l.Printf(color, format, a...)
 	}
 }
 
