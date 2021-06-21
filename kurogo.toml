@@ -2,3 +2,6 @@
 extensions = [".go"]
 command = "ls -a"
 
+[[actions]]
+files = ["kurogo.toml"]
+command = "echo 'config file changed'"
