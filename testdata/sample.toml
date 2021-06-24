@@ -1,0 +1,5 @@
+ignore = [".git"]
+
+[[actions]]
+extensions = [".go"]
+command = "echo 'run command'"
