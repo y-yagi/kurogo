@@ -21,6 +21,7 @@ type Runner struct {
 }
 
 type Config struct {
+	Ignore  []string
 	Actions []Action
 }
 
@@ -38,11 +39,11 @@ func NewRunner(filename string, logger *log.KurogoLogger) (*Runner, error) {
 		actionWithFile:      map[string]*Action{},
 	}
 
-	if err := r.buildWatcher(); err != nil {
+	if err := r.parseConfig(filename); err != nil {
 		return nil, err
 	}
 
-	if err := r.parseConfig(filename); err != nil {
+	if err := r.buildWatcher(); err != nil {
 		return nil, err
 	}
 
@@ -136,6 +137,10 @@ func (r *Runner) buildWatcher() error {
 	var err error
 	if r.watcher, err = rnotify.NewWatcher(); err != nil {
 		return err
+	}
+
+	if len(r.cfg.Ignore) != 0 {
+		r.watcher.Ignore(r.cfg.Ignore)
 	}
 
 	return nil

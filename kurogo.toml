@@ -1,3 +1,5 @@
+ignore = [".git"]
+
 [[actions]]
 extensions = [".go"]
 command = "ls -a"

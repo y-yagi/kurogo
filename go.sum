@@ -12,6 +12,8 @@ github.com/mattn/go-isatty v0.0.12 h1:wuysRhFDzyxgEmMf5xjvJ2M9dZoWAXNNr5LSBS7uHX
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
 github.com/y-yagi/rnotify v0.1.0 h1:BsQOb/NasdSAi93bqQ5EJpTHO6YsVavKQDLtjZHf1T4=
 github.com/y-yagi/rnotify v0.1.0/go.mod h1:3UIXVooaZB6ndT7tRnTyEAEp2WNcDjnXceilC4bhY88=
+github.com/y-yagi/rnotify v0.1.1-0.20210623015509-608d88a46c40 h1:72ODvO75YaRRqJDN64jJR7mNEjfnHg9Pw4y/fgX/faY=
+github.com/y-yagi/rnotify v0.1.1-0.20210623015509-608d88a46c40/go.mod h1:nOx6sEsnYOB5MNZddQyEMjV8fXzm1FMzrIzlpLrCz5Y=
 golang.org/x/sys v0.0.0-20191005200804-aed5e4c7ecf9 h1:L2auWcuQIvxz9xSEqzESnV/QN/gNRXNApHi3fYwl2w0=
 golang.org/x/sys v0.0.0-20191005200804-aed5e4c7ecf9/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200116001909-b77594299b42/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
