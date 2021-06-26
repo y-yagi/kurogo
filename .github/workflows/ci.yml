@@ -24,3 +24,10 @@ jobs:
         version: v1.40
         args: -D errcheck
 
+    - name: Build
+      run: |
+        go build .
+
+    - name: Run tests
+      run: |
+        go test -v
