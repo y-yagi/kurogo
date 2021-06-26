@@ -1,4 +1,4 @@
-ignore = [".git"]
+ignore = [".git", "tmp"]
 
 [[actions]]
 extensions = [".go"]
