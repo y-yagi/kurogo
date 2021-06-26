@@ -18,6 +18,7 @@ type Runner struct {
 	logger              *log.KurogoLogger
 	actionWithExtension map[string]*Action
 	actionWithFile      map[string]*Action
+	path                string
 }
 
 type Config struct {
@@ -31,12 +32,13 @@ type Action struct {
 	Files      []string
 }
 
-func NewRunner(filename string, logger *log.KurogoLogger) (*Runner, error) {
+func NewRunner(filename string, logger *log.KurogoLogger, path string) (*Runner, error) {
 	r := &Runner{
 		eventCh:             make(chan string, 1000),
 		logger:              logger,
 		actionWithExtension: map[string]*Action{},
 		actionWithFile:      map[string]*Action{},
+		path:                path,
 	}
 
 	if err := r.parseConfig(filename); err != nil {
@@ -75,7 +77,7 @@ func (r *Runner) Terminate() error {
 }
 
 func (r *Runner) watch() error {
-	if err := r.watcher.Add("."); err != nil {
+	if err := r.watcher.Add(r.path); err != nil {
 		return err
 	}
 
