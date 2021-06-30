@@ -6,10 +6,13 @@ github.com/fsnotify/fsevents v0.1.1 h1:/125uxJvvoSDDBPen6yUZbil8J9ydKZnnl3TWWmvn
 github.com/fsnotify/fsevents v0.1.1/go.mod h1:+d+hS27T6k5J8CRaPLKFgwKYcpS7GwW3Ule9+SC2ZRc=
 github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWoS4=
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
+github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/mattn/go-colorable v0.1.8 h1:c1ghPdyEDarC70ftn0y+A/Ee++9zz8ljHG1b13eJ0s8=
 github.com/mattn/go-colorable v0.1.8/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
 github.com/mattn/go-isatty v0.0.12 h1:wuysRhFDzyxgEmMf5xjvJ2M9dZoWAXNNr5LSBS7uHXY=
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
+github.com/y-yagi/goext v0.6.0 h1:kOa5CbcuZlVzjQM5U2EH16pu6P6tWc7/XQrIxlCyltM=
+github.com/y-yagi/goext v0.6.0/go.mod h1:n/8nSrIm39oaYJr+mJxMOS/VuAL4ZF6ZMAevjv5DdI4=
 github.com/y-yagi/rnotify v0.1.1-0.20210623015509-608d88a46c40 h1:72ODvO75YaRRqJDN64jJR7mNEjfnHg9Pw4y/fgX/faY=
 github.com/y-yagi/rnotify v0.1.1-0.20210623015509-608d88a46c40/go.mod h1:nOx6sEsnYOB5MNZddQyEMjV8fXzm1FMzrIzlpLrCz5Y=
 golang.org/x/sys v0.0.0-20191005200804-aed5e4c7ecf9/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=

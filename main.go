@@ -4,9 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"runtime"
 
+	"github.com/y-yagi/goext/osext"
 	"github.com/y-yagi/kurogo/internal/log"
 	"github.com/y-yagi/kurogo/internal/runner"
 )
@@ -20,6 +22,7 @@ var (
 	configFile  string
 	debug       bool
 	path        string
+	initFlag    bool
 
 	logger  *log.KurogoLogger
 	version = "devel"
@@ -37,6 +40,7 @@ func setFlags() {
 	flags.StringVar(&path, "p", ".", "specify a monitoring path")
 	flags.StringVar(&configFile, "f", "kurogo.toml", "use file as a configuration file")
 	flags.BoolVar(&debug, "d", false, "enable debug log")
+	flags.BoolVar(&initFlag, "init", false, "generate an example of a configuration file")
 	flags.Usage = usage
 }
 
@@ -65,6 +69,10 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return 0
 	}
 
+	if initFlag {
+		return msg(setUpCommand(stdout), stderr)
+	}
+
 	if debug {
 		logger.EnableDebugLog()
 	}
@@ -79,4 +87,29 @@ func run(args []string, stdout, stderr io.Writer) int {
 	}
 
 	return 0
+}
+
+func setUpCommand(stdout io.Writer) error {
+	filename := "kurogo.toml"
+	if osext.IsExist(filename) {
+		return fmt.Errorf("'%v' already exists", filename)
+	}
+
+	example := `ignore = [".git", "tmp"]
+
+[[actions]]
+extensions = [".go"]
+command = "ls -a"
+
+[[actions]]
+files = ["go.mod"]
+command = "echo go.mod changed'"
+`
+
+	if err := ioutil.WriteFile(filename, []byte(example), 0644); err != nil {
+		return err
+	}
+
+	fmt.Fprintf(stdout, "Generated a '%s'\n", filename)
+	return nil
 }
