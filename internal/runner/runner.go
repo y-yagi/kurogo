@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -99,6 +100,11 @@ func (r *Runner) watch() error {
 				if !ok {
 					return
 				}
+
+				if os.IsNotExist(err) {
+					return
+				}
+
 				r.logger.Printf(log.Red, "error: %v\n", err)
 			}
 		}
