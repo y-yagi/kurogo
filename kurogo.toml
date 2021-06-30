@@ -2,7 +2,7 @@ ignore = [".git", "tmp"]
 
 [[actions]]
 extensions = [".go"]
-command = "ls -a"
+command = "go build ."
 
 [[actions]]
 files = ["kurogo.toml"]
