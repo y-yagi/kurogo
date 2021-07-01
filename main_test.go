@@ -30,12 +30,19 @@ func TestRun(t *testing.T) {
 	time.Sleep(2 * time.Second)
 	current := time.Now().Local()
 	os.Chtimes("main_test.go", current, current)
+	time.Sleep(1 * time.Second)
+	os.Chtimes("testdata/sample.toml", current, current)
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(stdout)
 	got := buf.String()
 
 	want := "run command"
+	if !strings.Contains(got, want) {
+		t.Fatalf("expected \n%s\n\nbut got \n\n%s\n", want, got)
+	}
+
+	want = "testdata/sample.toml"
 	if !strings.Contains(got, want) {
 		t.Fatalf("expected \n%s\n\nbut got \n\n%s\n", want, got)
 	}
