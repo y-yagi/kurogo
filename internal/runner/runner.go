@@ -64,11 +64,11 @@ func (r *Runner) Run() error {
 		r.discardEvents()
 
 		if action, ok := r.actionWithExtension[filepath.Ext(filename)]; ok {
-			r.executeCmd(action)
+			r.executeCmd(action, filename)
 		}
 
 		if action, ok := r.actionWithFile[filepath.Base(filename)]; ok {
-			r.executeCmd(action)
+			r.executeCmd(action, filename)
 		}
 	}
 }
@@ -154,9 +154,10 @@ func (r *Runner) buildWatcher() error {
 	return nil
 }
 
-func (r *Runner) executeCmd(action *Action) {
-	r.logger.Printf(nil, "Run '%v'\n", action.Command)
-	cmd := strings.Split(action.Command, " ")
+func (r *Runner) executeCmd(action *Action, filename string) {
+	parsedCmd := strings.ReplaceAll(action.Command, "{{.Filename}}", filename)
+	r.logger.Printf(nil, "Run '%v'\n", parsedCmd)
+	cmd := strings.Split(parsedCmd, " ")
 	stdoutStderr, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
 	if err != nil {
 		r.logger.Printf(log.Red, "'%v' failed! %v\n", action.Command, err)
@@ -167,6 +168,6 @@ func (r *Runner) executeCmd(action *Action) {
 	}
 
 	if err == nil {
-		r.logger.Printf(log.Green, "'%v' success!\n", action.Command)
+		r.logger.Printf(log.Green, "'%v' success!\n", parsedCmd)
 	}
 }

@@ -3,3 +3,7 @@ ignore = [".git", "tmp"]
 [[actions]]
 extensions = [".go"]
 command = "echo 'run command'"
+
+[[actions]]
+files = ["sample.toml"]
+command = "echo '{{.Filename}}'"
