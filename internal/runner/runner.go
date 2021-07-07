@@ -14,7 +14,7 @@ import (
 
 type Runner struct {
 	watcher             *rnotify.Watcher
-	eventCh             chan string
+	eventCh             chan Event
 	cfg                 Config
 	logger              *log.KurogoLogger
 	actionWithExtension map[string]*Action
@@ -33,9 +33,14 @@ type Action struct {
 	Files      []string
 }
 
+type Event struct {
+	action   *Action
+	filename string
+}
+
 func NewRunner(filename string, logger *log.KurogoLogger, path string) (*Runner, error) {
 	r := &Runner{
-		eventCh:             make(chan string, 1000),
+		eventCh:             make(chan Event, 1000),
 		logger:              logger,
 		actionWithExtension: map[string]*Action{},
 		actionWithFile:      map[string]*Action{},
@@ -59,17 +64,11 @@ func (r *Runner) Run() error {
 	}
 
 	for {
-		filename := <-r.eventCh
+		event := <-r.eventCh
 		time.Sleep(500 * time.Millisecond)
 		r.discardEvents()
 
-		if action, ok := r.actionWithExtension[filepath.Ext(filename)]; ok {
-			r.executeCmd(action, filename)
-		}
-
-		if action, ok := r.actionWithFile[filepath.Base(filename)]; ok {
-			r.executeCmd(action, filename)
-		}
+		r.executeCmd(event.action, event.filename)
 	}
 }
 
@@ -91,10 +90,10 @@ func (r *Runner) watch() error {
 					return
 				}
 
-				if _, ok := r.actionWithExtension[filepath.Ext(event.Name)]; ok {
-					r.eventCh <- event.Name
-				} else if _, ok := r.actionWithFile[filepath.Base(event.Name)]; ok {
-					r.eventCh <- event.Name
+				if action, ok := r.actionWithExtension[filepath.Ext(event.Name)]; ok {
+					r.eventCh <- Event{action: action, filename: event.Name}
+				} else if action, ok := r.actionWithFile[filepath.Base(event.Name)]; ok {
+					r.eventCh <- Event{action: action, filename: event.Name}
 				}
 			case err, ok := <-r.watcher.Errors:
 				if !ok {
