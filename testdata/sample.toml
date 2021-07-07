@@ -7,3 +7,7 @@ command = "echo 'run command'"
 [[actions]]
 files = ["sample.toml"]
 command = "echo '{{.Filename}}'"
+
+[[actions]]
+patterns = ["_test.rb"]
+command = "echo '{{.Filename}}'"

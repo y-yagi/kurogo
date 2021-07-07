@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -19,6 +20,7 @@ type Runner struct {
 	logger              *log.KurogoLogger
 	actionWithExtension map[string]*Action
 	actionWithFile      map[string]*Action
+	actionWithPattern   map[*regexp.Regexp]*Action
 	path                string
 }
 
@@ -31,10 +33,10 @@ type Action struct {
 	Command    string
 	Extensions []string
 	Files      []string
+	Patterns   []string
 }
 
 type Event struct {
-	action   *Action
 	filename string
 }
 
@@ -44,6 +46,7 @@ func NewRunner(filename string, logger *log.KurogoLogger, path string) (*Runner,
 		logger:              logger,
 		actionWithExtension: map[string]*Action{},
 		actionWithFile:      map[string]*Action{},
+		actionWithPattern:   map[*regexp.Regexp]*Action{},
 		path:                path,
 	}
 
@@ -64,11 +67,28 @@ func (r *Runner) Run() error {
 	}
 
 	for {
+		var actions []*Action
 		event := <-r.eventCh
-		time.Sleep(500 * time.Millisecond)
-		r.discardEvents()
+		if action, ok := r.actionWithExtension[filepath.Ext(event.filename)]; ok {
+			actions = append(actions, action)
+		}
+		if action, ok := r.actionWithFile[filepath.Base(event.filename)]; ok {
+			actions = append(actions, action)
+		}
+		for reg, action := range r.actionWithPattern {
+			if matched := reg.Match([]byte(event.filename)); matched {
+				actions = append(actions, action)
+			}
+		}
 
-		r.executeCmd(event.action, event.filename)
+		if len(actions) != 0 {
+			time.Sleep(500 * time.Millisecond)
+			r.discardEvents()
+
+			for _, action := range actions {
+				r.executeCmd(action, event.filename)
+			}
+		}
 	}
 }
 
@@ -90,11 +110,7 @@ func (r *Runner) watch() error {
 					return
 				}
 
-				if action, ok := r.actionWithExtension[filepath.Ext(event.Name)]; ok {
-					r.eventCh <- Event{action: action, filename: event.Name}
-				} else if action, ok := r.actionWithFile[filepath.Base(event.Name)]; ok {
-					r.eventCh <- Event{action: action, filename: event.Name}
-				}
+				r.eventCh <- Event{filename: event.Name}
 			case err, ok := <-r.watcher.Errors:
 				if !ok {
 					return
@@ -134,6 +150,14 @@ func (r *Runner) parseConfig(filename string) error {
 
 		for _, file := range action.Files {
 			r.actionWithFile[file] = &r.cfg.Actions[m]
+		}
+
+		for _, pattern := range action.Patterns {
+			reg, err := regexp.Compile(pattern)
+			if err != nil {
+				return err
+			}
+			r.actionWithPattern[reg] = &r.cfg.Actions[m]
 		}
 	}
 

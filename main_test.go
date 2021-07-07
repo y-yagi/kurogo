@@ -32,6 +32,8 @@ func TestRun(t *testing.T) {
 	os.Chtimes("main_test.go", current, current)
 	time.Sleep(1 * time.Second)
 	os.Chtimes("testdata/sample.toml", current, current)
+	time.Sleep(1 * time.Second)
+	os.Chtimes("testdata/dummy_test.rb", current, current)
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(stdout)
@@ -43,6 +45,11 @@ func TestRun(t *testing.T) {
 	}
 
 	want = "testdata/sample.toml"
+	if !strings.Contains(got, want) {
+		t.Fatalf("expected \n%s\n\nbut got \n\n%s\n", want, got)
+	}
+
+	want = "testdata/dummy_test.rb"
 	if !strings.Contains(got, want) {
 		t.Fatalf("expected \n%s\n\nbut got \n\n%s\n", want, got)
 	}

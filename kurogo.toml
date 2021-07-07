@@ -7,3 +7,7 @@ command = "go build ."
 [[actions]]
 files = ["kurogo.toml"]
 command = "echo 'config file changed'"
+
+[[actions]]
+patterns = ["_test.go"]
+command = "go test {{.Filename}}"
