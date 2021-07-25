@@ -21,7 +21,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
-          args: release --rm-dist
+          args: release --rm-dist -f .goreleaser-linux.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -40,7 +40,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
-          args: release --rm-dist
+          args: release --rm-dist -f .goreleaser-darwin.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -59,6 +59,6 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
-          args: release --rm-dist
+          args: release --rm-dist -f .goreleaser-windows.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
