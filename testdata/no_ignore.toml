@@ -1,3 +1,7 @@
 [[actions]]
 extensions = [".go"]
 commands = ["echo 'run command'"]
+
+[[actions]]
+files = ["dummy.toml"]
+commands = ["ech 1", "echo 2"]
