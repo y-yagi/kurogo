@@ -185,6 +185,7 @@ func (r *Runner) executeCmd(action *Action, filename string) {
 		stdoutStderr, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
 		if err != nil {
 			r.logger.Printf(log.Red, "'%v' failed! %v\n", command, err)
+			break
 		}
 
 		if len(string(stdoutStderr)) != 0 {
