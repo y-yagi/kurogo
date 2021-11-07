@@ -6,8 +6,12 @@ command = "go build ."
 
 [[actions]]
 files = ["kurogo.toml"]
-command = "echo 'config file changed'"
+commands = ["echo 'config file changed'"]
 
 [[actions]]
 patterns = ["_test.go"]
-command = "go test {{.Filename}}"
+commands = ["go test {{.Filename}}"]
+
+[[actions]]
+extensions = [".go"]
+commands = ["ls", "echo"]
