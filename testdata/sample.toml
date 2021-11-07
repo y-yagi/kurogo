@@ -2,12 +2,12 @@ ignore = [".git", "tmp"]
 
 [[actions]]
 extensions = [".go"]
-command = "echo 'run command'"
+commands = ["echo 'run command'"]
 
 [[actions]]
 files = ["sample.toml"]
-command = "echo '{{.Filename}}'"
+commands = ["echo '{{.Filename}}'"]
 
 [[actions]]
 patterns = ["_test.rb"]
-command = "echo '{{.Filename}}'"
+commands = ["echo '{{.Filename}}'"]

@@ -30,7 +30,7 @@ type Config struct {
 }
 
 type Action struct {
-	Command    string
+	Commands   []string
 	Extensions []string
 	Files      []string
 	Patterns   []string
@@ -178,19 +178,22 @@ func (r *Runner) buildWatcher() error {
 }
 
 func (r *Runner) executeCmd(action *Action, filename string) {
-	parsedCmd := strings.ReplaceAll(action.Command, "{{.Filename}}", filename)
-	r.logger.Printf(nil, "Run '%v'\n", parsedCmd)
-	cmd := strings.Split(parsedCmd, " ")
-	stdoutStderr, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
-	if err != nil {
-		r.logger.Printf(log.Red, "'%v' failed! %v\n", action.Command, err)
-	}
+	for _, command := range action.Commands {
+		parsedCmd := strings.ReplaceAll(command, "{{.Filename}}", filename)
+		r.logger.Printf(nil, "Run '%v'\n", parsedCmd)
+		cmd := strings.Split(parsedCmd, " ")
+		stdoutStderr, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
+		if err != nil {
+			r.logger.Printf(log.Red, "'%v' failed! %v\n", command, err)
+			break
+		}
 
-	if len(string(stdoutStderr)) != 0 {
-		r.logger.Printf(nil, "%s\n", stdoutStderr)
-	}
+		if len(string(stdoutStderr)) != 0 {
+			r.logger.Printf(nil, "%s\n", stdoutStderr)
+		}
 
-	if err == nil {
-		r.logger.Printf(log.Green, "'%v' success!\n", parsedCmd)
+		if err == nil {
+			r.logger.Printf(log.Green, "'%v' success!\n", parsedCmd)
+		}
 	}
 }
