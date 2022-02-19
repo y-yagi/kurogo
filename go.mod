@@ -3,7 +3,7 @@ module github.com/y-yagi/kurogo
 go 1.17
 
 require (
-	github.com/BurntSushi/toml v0.4.1
+	github.com/BurntSushi/toml v1.0.0
 	github.com/fatih/color v1.13.0
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
@@ -14,7 +14,7 @@ require (
 
 require (
 	github.com/fsnotify/fsevents v0.1.1 // indirect
-	github.com/mattn/go-colorable v0.1.11 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
 )
 
 replace github.com/fsnotify/fsnotify => github.com/y-yagi/fsnotify v1.4.10-0.20201227062311-078207fcf401
