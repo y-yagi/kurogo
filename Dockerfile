@@ -1,0 +1,10 @@
+FROM golang:1.17-alpine as builder
+
+WORKDIR /go/src/app
+ADD . /go/src/app
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/bin/kurogo -ldflags '-s -w'
+
+FROM alpine
+COPY --from=builder /go/bin/kurogo /
+CMD /kurogo
