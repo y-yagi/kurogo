@@ -7,58 +7,19 @@ on:
 
 jobs:
   linux:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.18
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Run release
-        uses: goreleaser/goreleaser-action@v2
-        with:
-          version: latest
-          args: release --rm-dist -f .goreleaser-linux.yml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: ./.github/workflows/release-action.yml
+    with:
+      runs_on: ubuntu-latest
+      configfile: .goreleaser-linux.yml
 
   darwin:
-    runs-on: macos-latest
-    steps:
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.18
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Run release
-        uses: goreleaser/goreleaser-action@v2
-        with:
-          version: latest
-          args: release --rm-dist -f .goreleaser-darwin.yml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: ./.github/workflows/release-action.yml
+    with:
+      runs_on: macos-latest
+      configfile: .goreleaser-darwin.yml
 
   windows:
-    runs-on: windows-latest
-    steps:
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.18
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
-
-      - name: Run release
-        uses: goreleaser/goreleaser-action@v2
-        with:
-          version: latest
-          args: release --rm-dist -f .goreleaser-windows.yml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: ./.github/workflows/release-action.yml
+    with:
+      runs_on: windows-latest
+      configfile: .goreleaser-windows.yml

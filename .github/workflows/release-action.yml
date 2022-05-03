@@ -1,0 +1,30 @@
+on:
+  workflow_call:
+    inputs:
+      configfile:
+        required: true
+        type: string
+      runs_on:
+        required: true
+        type: string
+
+
+jobs:
+  release:
+    runs-on: ${{ inputs.runs_on }}
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run release
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --rm-dist -f ${{ inputs.configfile }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
