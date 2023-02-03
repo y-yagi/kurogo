@@ -3,7 +3,6 @@ package main_test
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -71,7 +70,7 @@ func TestIgnore(t *testing.T) {
 	}
 
 	time.Sleep(2 * time.Second)
-	ioutil.WriteFile("tmp/main.go", []byte("Hello"), 0644)
+	os.WriteFile("tmp/main.go", []byte("Hello"), 0644)
 	defer os.Remove("tmp/main.go")
 
 	buf := new(bytes.Buffer)
@@ -85,7 +84,7 @@ func TestIgnore(t *testing.T) {
 }
 
 func TestPath(t *testing.T) {
-	tempDir, err := ioutil.TempDir("", "kurogotest")
+	tempDir, err := os.MkdirTemp("", "kurogotest")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,7 +105,7 @@ func TestPath(t *testing.T) {
 	}
 
 	time.Sleep(2 * time.Second)
-	ioutil.WriteFile(path.Join(tempDir, "main.go"), []byte("Hello"), 0644)
+	os.WriteFile(path.Join(tempDir, "main.go"), []byte("Hello"), 0644)
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(stdout)
@@ -134,7 +133,7 @@ func TestMultipleCommand_FailFast(t *testing.T) {
 	}
 
 	time.Sleep(2 * time.Second)
-	ioutil.WriteFile("tmp/dummy.toml", []byte("Hello"), 0644)
+	os.WriteFile("tmp/dummy.toml", []byte("Hello"), 0644)
 	defer os.Remove("tmp/dummy.toml")
 
 	buf := new(bytes.Buffer)

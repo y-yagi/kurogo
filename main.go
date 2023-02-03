@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"runtime"
 
@@ -106,7 +105,7 @@ files = ["go.mod"]
 command = "echo go.mod changed'"
 `
 
-	if err := ioutil.WriteFile(filename, []byte(example), 0644); err != nil {
+	if err := os.WriteFile(filename, []byte(example), 0644); err != nil {
 		return err
 	}
 
